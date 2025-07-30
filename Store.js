@@ -141,27 +141,47 @@ async function doStore(topic, payload) {
         return;
     }
 
-    // necesitamops tipo y ubicacion del nodo (no tenemos gps aun)
-    //   + debe estar en la base de datos
-    //   + debe estar activo
-    //   + usamos su georeferenciacion activo
+    // necesitamos tipo del nodo y ubicacion (latitud/longitud)
+    // el nodo debe existir en la base de datos
+    // las coordenadas vienen desde estacion o colmena segun el tipo
     let nodo_tipo;
-    let nodo_latitud
+    let nodo_latitud;
     let nodo_longitud;
     try {
-        const sql = 'SELECT n.tipo, nu.latitud, nu.longitud ' +
-            'FROM nodo n ' +
-            'INNER JOIN nodo_ubicacion nu ON n.id = nu.nodo_id and nu.activo = 1 ' +
-            'WHERE n.id = ? and n.activo = 1';
-        const [rows] = await db.query(sql, [nodo_id]);
-        if (rows.length != 1) {
+        // primero obtenemos el tipo de nodo
+        const sqlNodo = 'SELECT tipo FROM nodo WHERE id = ?';
+        const [nodoRows] = await db.query(sqlNodo, [nodo_id]);
+        if (nodoRows.length != 1) {
             Utils.logError("Nodo no existe en la Base de Datos:");
             Utils.logError(`    ${nodo_id}`);
             return;
         }
-        nodo_tipo = rows[0].tipo;
-        nodo_latitud = rows[0].latitud;
-        nodo_longitud = rows[0].longitud;
+        nodo_tipo = nodoRows[0].tipo;
+
+        // ahora obtenemos las coordenadas segun el tipo de nodo
+        let locationSql;
+        if (nodo_tipo == "COLMENA") {
+            locationSql = 'SELECT c.latitud, c.longitud ' +
+                'FROM nodo_colmena nc ' +
+                'INNER JOIN colmena c ON nc.colmena_id = c.id ' +
+                'WHERE nc.nodo_id = ?';
+        } else {
+            // asumimos que es tipo ESTACION o similar
+            locationSql = 'SELECT e.latitud, e.longitud ' +
+                'FROM nodo_estacion ne ' +
+                'INNER JOIN estacion e ON ne.estacion_id = e.id ' +
+                'WHERE ne.nodo_id = ?';
+        }
+
+        const [locationRows] = await db.query(locationSql, [nodo_id]);
+        if (locationRows.length != 1) {
+            Utils.logError("No se encontro ubicacion para el nodo en la Base de Datos:");
+            Utils.logError(`    ${nodo_id} (tipo: ${nodo_tipo})`);
+            return;
+        }
+        nodo_latitud = locationRows[0].latitud;
+        nodo_longitud = locationRows[0].longitud;
+
     } catch (err) {
         Utils.logError("Error al recuperar datos del nodo desde la Base de Datos:");
         Utils.logError(`    ${err.message}`);

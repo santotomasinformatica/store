@@ -1,8 +1,7 @@
-import { readFileSync } from 'fs';
 
 const CA = null;
-const USER = "smartbee_user";           // ← Usuario que crearás
-const PASS = "smartbee123";             // ← Password que crearás
+const USER = "smartbee_user";    
+const PASS = "smartbee123";          
 const TOPIC = "SmartBee/nodes/+/data";
 const node_id = "NODO-7881883A-97A5-47E0-869C-753E99E1B168";
 
@@ -13,7 +12,6 @@ const db = {
     user: "root",
     password: "DwPLKjZIkHdyGcjLmnsmQIwWvDjisbBm"
 };
-
 const mqttWSS = {
     url: "wss://smartbee.cl:443/apps/mqtt.rcr",
     ca: CA,

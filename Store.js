@@ -43,16 +43,28 @@ async function app() {
     try {
         const mqttClientId = 'STORE-APP-' + uuidv4();
         Utils.logInfo(`Conectando al Broker en ${config.mqtt.url}`);
-        mqttClient = await mqttConnectAsync(config.mqtt.url, {
+        
+        // Configuración para broker público
+        const mqttOptions = {
             clientId: mqttClientId,
-            username: config.mqtt.username,
-            password: config.mqtt.password,
             clean: true,
             connectTimeout: 4000,
             reconnectPeriod: 1000,
-            ca: config.mqtt.ca,
-            rejectUnauthorized: true
-        });
+            rejectUnauthorized: false  // Para broker público
+        };
+
+        // Solo agregar credenciales si están definidas y no vacías
+        if (config.mqtt.username && config.mqtt.username.trim() !== '') {
+            mqttOptions.username = config.mqtt.username;
+        }
+        if (config.mqtt.password && config.mqtt.password.trim() !== '') {
+            mqttOptions.password = config.mqtt.password;
+        }
+        if (config.mqtt.ca) {
+            mqttOptions.ca = config.mqtt.ca;
+        }
+
+        mqttClient = await mqttConnectAsync(config.mqtt.url, mqttOptions);
         Utils.logInfo('Conectado al Broker');
     }
     catch (err) {
@@ -90,6 +102,7 @@ async function app() {
     });
 
     // nos suscribimos a todos los mensajes de los nodos sensores
+    Utils.logInfo(`Suscribiéndose al tópico: ${config.mqtt.topic}`);
     mqttClient.subscribe(config.mqtt.topic);
 }
 
@@ -106,6 +119,9 @@ async function processMessages(topic, message) {
         return;
     }
 
+    Utils.logInfo(`Mensaje recibido en tópico: ${topic}`);
+    Utils.logInfo(`Payload: ${strMessage}`);
+
     // intentamos almacenarlo
     await doStore(topic, payload);
 }
@@ -119,11 +135,12 @@ async function doStore(topic, payload) {
         return;
     }
 
-    // el topico tiene una regla de formacion basada en el id del nodo
-    const topic_ = "SmartBee/nodes/" + nodo_id + "/data";
+    // el topico tiene una nueva regla de formación: testtopic/smartbee/{nodo_id}
+    const topic_ = "testtopic/smartbee/" + nodo_id;
     if (topic != topic_) {
         Utils.logError("Topico es invalido:");
-        Utils.logError(`    ${topic} != ${topic_}`);
+        Utils.logError(`    Recibido: ${topic}`);
+        Utils.logError(`    Esperado: ${topic_}`);
         return;
     }
 
@@ -214,6 +231,12 @@ async function doStore(topic, payload) {
     }
     if (nodo_tipo == "COLMENA")
         msg.peso = peso;
+    
+    // Agregar timestamp si viene en el payload
+    if (payload.timestamp) {
+        msg.timestamp = payload.timestamp;
+    }
+    
     msg = JSON.stringify(msg);
     try {
         const sql = "INSERT INTO nodo_mensaje(nodo_id, topico, payload) VALUES(?, ?, ?)";
@@ -225,10 +248,11 @@ async function doStore(topic, payload) {
     }
 
     // mostramos lo recibido
-    Utils.logInfo("Datos almacenados en la Base de Datos:");
-    Utils.logInfo(`    ${nodo_id}`)
-    Utils.logInfo(`    ${topic}`)
-    Utils.logInfo(`    ${msg}`)
+    Utils.logInfo("✅ Datos almacenados en la Base de Datos:");
+    Utils.logInfo(`    Nodo: ${nodo_id} (${nodo_tipo})`)
+    Utils.logInfo(`    Tópico: ${topic}`)
+    Utils.logInfo(`    Datos: T=${temperatura}°C, H=${humedad}%, ${nodo_tipo === 'COLMENA' ? `P=${peso}kg, ` : ''}Lat=${nodo_latitud}, Lng=${nodo_longitud}`)
+    Utils.logInfo(`    Payload completo: ${msg}`)
 
     // eso es todo
     return;

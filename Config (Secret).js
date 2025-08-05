@@ -1,8 +1,7 @@
-
 const CA = null;
-const USER = "smartbee_user";    
-const PASS = "smartbee123";          
-const TOPIC = "SmartBee/nodes/+/data";
+const USER = "";    // broker.emqx.io no requiere usuario
+const PASS = "";    // broker.emqx.io no requiere contraseña          
+const TOPIC = "testtopic/smartbee/+";  // Nuevo patrón de tópico
 const node_id = "NODO-7881883A-97A5-47E0-869C-753E99E1B168";
 
 const db = {
@@ -12,8 +11,9 @@ const db = {
     user: "root",
     password: "DwPLKjZIkHdyGcjLmnsmQIwWvDjisbBm"
 };
+
 const mqttWSS = {
-    url: "wss://smartbee.cl:443/apps/mqtt.rcr",
+    url: "wss://broker.emqx.io:8084/mqtt",  // WebSocket Secure público
     ca: CA,
     username: USER,
     password: PASS,
@@ -21,7 +21,7 @@ const mqttWSS = {
 };
 
 const mqttTLS = {
-    url: "mqtts://n0740bf0.ala.us-east-1.emqxsl.com:8883",  // ← Tu servidor EMQX
+    url: "mqtts://broker.emqx.io:8883",     // MQTT TLS público
     ca: null,
     username: USER,
     password: PASS,
@@ -29,15 +29,15 @@ const mqttTLS = {
 };
 
 const mqttPLAIN = {
-    url: "mqtt://n0740bf0.ala.us-east-1.emqxsl.com:1883",   // ← Tu servidor EMQX (puerto normal)
+    url: "mqtt://broker.emqx.io:1883",      // MQTT plano público
     ca: null,
     username: USER,
     password: PASS,
     topic: TOPIC,
 };
 
-// Usar TLS para conexión segura
-const mqtt = mqttTLS;
+// Usar PLAIN para broker público (más simple y confiable)
+const mqtt = mqttPLAIN;
 const debug = true;
 
 const config = {

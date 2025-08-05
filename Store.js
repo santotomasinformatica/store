@@ -136,7 +136,7 @@ async function doStore(topic, payload) {
     }
 
     // el topico tiene una nueva regla de formación: testtopic/smartbee/{nodo_id}
-    const topic_ = "testtopic/smartbee/" + nodo_id;
+    const topic_ = "testtopic/smartbee/";
     if (topic != topic_) {
         Utils.logError("Topico es invalido:");
         Utils.logError(`    Recibido: ${topic}`);

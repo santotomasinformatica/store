@@ -135,7 +135,7 @@ async function doStore(topic, payload) {
         return;
     }
 
-    // el topico tiene una nueva regla de formación: testtopic/smartbee/{nodo_id}
+    // el topico es fijo: testtopic/smartbee/
     const topic_ = "testtopic/smartbee/";
     if (topic != topic_) {
         Utils.logError("Topico es invalido:");
@@ -210,14 +210,19 @@ async function doStore(topic, payload) {
     if (nodo_tipo == "COLMENA") {
         peso = Number(peso);
         if (isNaN(peso)) {
-            Utils.logError("Valor de PESO es invalido");
+            Utils.logError("Valor de PESO es invalido para nodo COLMENA");
             return;
         }
     }
+    // Para nodos ambientales, el peso es opcional y puede ser undefined
     else {
-        if (peso != undefined) {
-            Utils.logError("PESO no es valido para este nodo");
-            return;
+        if (peso !== undefined) {
+            peso = Number(peso);
+            // Si viene peso pero no es válido, lo ignoramos (no es crítico para nodos ambientales)
+            if (isNaN(peso)) {
+                Utils.logInfo("Peso presente pero inválido en nodo ambiental - ignorando");
+                peso = undefined;
+            }
         }
     }
 
@@ -229,8 +234,11 @@ async function doStore(topic, payload) {
         latitud: nodo_latitud,
         longitud: nodo_longitud
     }
-    if (nodo_tipo == "COLMENA")
+    
+    // Solo agregar peso si existe y es válido
+    if (peso !== undefined && !isNaN(peso)) {
         msg.peso = peso;
+    }
     
     // Agregar timestamp si viene en el payload
     if (payload.timestamp) {
@@ -251,7 +259,7 @@ async function doStore(topic, payload) {
     Utils.logInfo("✅ Datos almacenados en la Base de Datos:");
     Utils.logInfo(`    Nodo: ${nodo_id} (${nodo_tipo})`)
     Utils.logInfo(`    Tópico: ${topic}`)
-    Utils.logInfo(`    Datos: T=${temperatura}°C, H=${humedad}%, ${nodo_tipo === 'COLMENA' ? `P=${peso}kg, ` : ''}Lat=${nodo_latitud}, Lng=${nodo_longitud}`)
+    Utils.logInfo(`    Datos: T=${temperatura}°C, H=${humedad}%${peso !== undefined ? `, P=${peso}kg` : ''}, Lat=${nodo_latitud}, Lng=${nodo_longitud}`)
     Utils.logInfo(`    Payload completo: ${msg}`)
 
     // eso es todo

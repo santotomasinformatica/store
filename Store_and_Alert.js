@@ -283,7 +283,6 @@ class App {
     };
 }
 
-// --- Show Time
 
 const app = new App();
 try {

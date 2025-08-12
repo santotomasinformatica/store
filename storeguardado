@@ -278,7 +278,6 @@ class App {
         Log.info(`    Datos: T=${temperatura}°C, H=${humedad}%${peso !== undefined ? `, P=${peso}kg` : ''}, Lat=${nodo_latitud}, Lng=${nodo_longitud}`)
         Log.info(`    Payload completo: ${msg}`)
 
-        // eso es todo
         return;
     };
 }

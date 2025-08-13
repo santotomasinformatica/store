@@ -176,7 +176,6 @@ class App {
         }
 
         // necesitamos tipo del nodo y ubicacion (latitud/longitud)
-        // el nodo debe existir en la base de datos
         // las coordenadas vienen desde estacion o colmena segun el tipo
         let nodo_tipo;
         let nodo_latitud;

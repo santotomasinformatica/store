@@ -161,7 +161,6 @@ class App {
             return;
         }
 
-        // debe venir la temperatura
         const temperatura = Number(payload.temperatura);
         if (isNaN(temperatura)) {
             Log.error('    Valor de TEMPERATURA es invalido');

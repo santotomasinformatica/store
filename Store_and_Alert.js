@@ -11,10 +11,10 @@ const config = {
     },
     db: {
         host: "crossover.proxy.rlwy.net",
-        port: 23151,
+        port: 19862,
         database: "railway",
         user: "root",
-        password: "DwPLKjZIkHdyGcjLmnsmQIwWvDjisbBm"
+        password: "TNMRWNdUpXINOSpfsjzJivWFVppVijbK"
     },
     debug: true
 };

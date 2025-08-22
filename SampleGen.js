@@ -45,7 +45,7 @@ class App {
 
         this.log('Comenzando iteración sobre los nodos');
         for (const nodo of nodos) {
-            const topico = "testtopic/smartbee"
+            const topico = "testtopic/smartbeee"
             let fecha = new Date(inicio);
             const fecha_fin = new Date();
             this.log(`${nodo.id}:${nodo.tipo} / ${fecha.toISOString()}:${fecha_fin.toISOString()}`);

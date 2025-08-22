@@ -5,7 +5,7 @@ import { connectAsync as mqttConnectAsync } from 'mqtt';
 const config = {
     mqtt: {
         url: "mqtt://broker.emqx.io:1883",
-        topic: "testtopic/smartbee",
+        topic: "testtopic/smartbeee",
         username: "",
         password: ""
     },
@@ -154,7 +154,7 @@ class App {
         }
 
         // el topico es fijo: testtopic/smartbee/
-        const topic_ = "testtopic/smartbee";
+        const topic_ = "testtopic/smartbeee";
         if (topic != topic_) {
             Log.error('    Topico es invalido');
             Log.error(`    ${topic} != ${topic_}`);

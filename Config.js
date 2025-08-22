@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 // configuración Store&Alert
 const USER = "";
 const PASS = "";
-const TOPIC = "testtopic/smartbee";
+const TOPIC = "testtopic/smartbeee";
 
 // configuración de la base de datos
 const db = {
